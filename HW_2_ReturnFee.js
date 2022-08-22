@@ -70,13 +70,13 @@ async function returnFee_simple() {
         }
     ]
 
-    const contract = await new web3.eth.Contract(abi, CONTRACT_ADDRESS)
-    const claim = await contract.methods.claim(1)
+    const contract = new web3.eth.Contract(abi, CONTRACT_ADDRESS)
+    const claim = contract.methods.claim(1)
 
     const tx = {
         from: MY_ADDRESS,
         to: CONTRACT_ADDRESS, 
-        gas: 1153200,
+        gas: await claim.estimateGas({from: MY_ADDRESS}),
         data: claim.encodeABI()
     }
 

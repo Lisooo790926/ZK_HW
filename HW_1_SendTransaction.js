@@ -10,14 +10,17 @@ async function sendTransaction() {
     web3.eth.accounts.wallet.add(account)
     web3.eth.defaultAddress = account.address
 
-    const tx = {
+    var tx = {
         from: MY_ADDRESS,
         to: CONTRACT_ADDRESS, 
-        gas: 1153200,
+        gas: 0,
         value: Web3.utils.toWei('0.001', 'ether') 
     }
 
-    await new web3.eth.sendTransaction(tx, CONTRACT_ADDRESS, function(error, hash) {
+    // evaluate the estimate gas
+    tx.gas = await web3.eth.estimateGas(tx)
+
+    web3.eth.sendTransaction(tx, CONTRACT_ADDRESS, function(error, hash) {
         if (!error) {
             console.log(" The hash of your transaction is: ", hash);
         } else {
