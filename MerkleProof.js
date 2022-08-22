@@ -1,13 +1,13 @@
 const Web3 = require('Web3')
 const keccak256 = require("keccak256");
 const { MerkleTree } = require("merkletreejs");
+
 require('dotenv').config();
+const { API_URL, PRIVATE_KEY, MY_ADDRESS, CONTRACT_ADDRESS } = process.env;
 
-async function markleProof() {
+async function merkleProof() {
     
-    const { API_URL, PRIVATE_KEY, MY_ADDRESS, CONTRACT_ADDRESS } = process.env;
     const web3 = new Web3(API_URL)
-
     const abi = [
         {
             "inputs": [
@@ -97,5 +97,82 @@ async function markleProof() {
 }
 
 
+// simple version 
+async function merkleProof_simple() {
 
-markleProof()
+    const web3 = new Web3(API_URL)
+
+    // directly bind private key with account
+    const account = web3.eth.accounts.privateKeyToAccount(PRIVATE_KEY)
+    web3.eth.accounts.wallet.add(account)
+    web3.eth.defaultAddress = account.address
+
+    
+    const abi = [
+        {
+            "inputs": [
+                {
+                    "internalType": "uint256",
+                    "name": "",
+                    "type": "uint256"
+                }
+            ],
+            "name": "hashes",
+            "outputs": [
+                {
+                    "internalType": "bytes32",
+                    "name": "",
+                    "type": "bytes32"
+                }
+            ],
+            "stateMutability": "view",
+            "type": "function"
+        },
+        {
+            "inputs": [
+                {
+                    "internalType": "bytes32[]",
+                    "name": "proof",
+                    "type": "bytes32[]"
+                }
+            ],
+            "name": "merkleProof",
+            "outputs": [],
+            "stateMutability": "view",
+            "type": "function"
+        }
+    ]
+
+    const contract = await new web3.eth.Contract(abi, CONTRACT_ADDRESS)
+
+    // fetch all hashes
+    const ary = [4, 0, 1, 2, 3, 5, 6] // give the order for this (based on item's hashed order)
+    let hashes = []
+    for(let i=0;i<7;i++) {
+        hashes[i] = await contract.methods.hashes(ary[i]).call() 
+    }
+    // use markleTree method
+    const merkleTree = new MerkleTree(hashes, keccak256, { sortPairs: true });
+    const merkleProofKeys = merkleTree.getHexProof(hashes[0])
+    const merkleProof = await contract.methods.merkleProof(merkleProofKeys)
+
+    const tx = {
+        from: MY_ADDRESS,
+        to: CONTRACT_ADDRESS, 
+        gas: 1153200, // self defined gas
+        data: merkleProof.encodeABI()
+    }
+
+    await new web3.eth.sendTransaction(tx, CONTRACT_ADDRESS, function(error, hash) {
+        if (!error) {
+            console.log(" The hash of your transaction is: ", hash);
+        } else {
+            console.log("RAISE THE ERROR", error)
+        }
+    });
+
+}
+
+
+// merkleProof()
+merkleProof_simple()

@@ -1,9 +1,9 @@
 const Web3 = require('Web3')
 require('dotenv').config();
+const { API_URL, PRIVATE_KEY, MY_ADDRESS, CONTRACT_ADDRESS } = process.env;
 
 async function returnFee() {
-    
-    const { API_URL, PRIVATE_KEY, MY_ADDRESS, CONTRACT_ADDRESS } = process.env;
+
     const web3 = new Web3(API_URL)
     
     // test to get balance
@@ -46,4 +46,49 @@ async function returnFee() {
     )
 }
 
-returnFee()
+async function returnFee_simple() {
+
+    const web3 = new Web3(API_URL)
+    
+    const account = web3.eth.accounts.privateKeyToAccount(PRIVATE_KEY)
+    web3.eth.accounts.wallet.add(account)
+    web3.eth.defaultAddress = account.address
+
+    let abi = [
+        {
+            "inputs": [
+                {
+                    "internalType": "uint256",
+                    "name": "_amountInFinney",
+                    "type": "uint256"
+                }
+            ],
+            "name": "claim",
+            "outputs": [],
+            "stateMutability": "payable",
+            "type": "function"
+        }
+    ]
+
+    const contract = await new web3.eth.Contract(abi, CONTRACT_ADDRESS)
+    const claim = await contract.methods.claim(1)
+
+    const tx = {
+        from: MY_ADDRESS,
+        to: CONTRACT_ADDRESS, 
+        gas: 1153200,
+        data: claim.encodeABI()
+    }
+
+    web3.eth.sendTransaction(tx, function(error, hash) {
+        if (!error) {
+            console.log(" The hash of your transaction is: ", hash);
+        } else {
+            console.log("RAISE THE ERROR", error)
+        }
+    });
+
+}
+
+// returnFee()
+returnFee_simple()
