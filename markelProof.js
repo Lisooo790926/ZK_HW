@@ -5,23 +5,10 @@ require('dotenv').config();
 
 async function markleProof() {
     
-    const { API_URL, PRIVATE_KEY } = process.env;
+    const { API_URL, PRIVATE_KEY, MY_ADDRESS, CONTRACT_ADDRESS } = process.env;
     const web3 = new Web3(API_URL)
-    const myAddress = '0x67E73B3d9883e647D4f67bCB535913951268DA46'
-    const contractAddress = "0x847FB490b9255758738c1DBddD9E3049E9bC86c8"
 
     const abi = [
-        {
-            "inputs": [
-                {
-                    "internalType": "bytes32",
-                    "name": "_root",
-                    "type": "bytes32"
-                }
-            ],
-            "stateMutability": "nonpayable",
-            "type": "constructor"
-        },
         {
             "inputs": [
                 {
@@ -56,19 +43,14 @@ async function markleProof() {
         }
     ]
 
-    // const ary = ["zkpenguin","zkpancake","zkpolice","zkpig","zkplayground","zkpigeon","zkpoison"]
+    const contract = await new web3.eth.Contract(abi, CONTRACT_ADDRESS)
 
-    const contract = await new web3.eth.Contract(abi, contractAddress)
-
-    // check contract hash is the same as below soliditySha3 method
-    // await contract.methods.hashes(i).call()
-    // web3.utils.soliditySha3(ary[0])
-
-    const ary = [4, 0, 1, 2, 3, 5, 6]
+    const ary = [4, 0, 1, 2, 3, 5, 6] // give the order for this (based on item's hashed order)
 
     let hashes = []
     for(let i=0;i<7;i++) {
-        hashes[i] = await contract.methods.hashes(ary[i]).call()
+        // query this hashes
+        hashes[i] = await contract.methods.hashes(ary[i]).call() 
     }
 
     // use markleTree method
@@ -90,29 +72,27 @@ async function markleProof() {
     const root = hashWithSorted(level2Hash, level3)
     console.log(root)
 
+    // because sorted required
     function hashWithSorted(hash1, hash2) {
         if(hash1 > hash2) return web3.utils.soliditySha3(hash2, hash1);
         else return web3.utils.soliditySha3(hash1, hash2);
     }
 
-    // console.log(memoryAry)
+    // transaction definition
+    const tx = {
+        from: MY_ADDRESS,
+        to: CONTRACT_ADDRESS, 
+        gas: 1153200, // self defined gas
+        data: contract.methods.merkleProof(result).encodeABI()
+    }
 
-    // // transaction definition
-    // const tx = {
-    //     from: myAddress,
-    //     to: contractAddress, 
-    //     gas: 1153200,
-    //     data: contract.methods.merkleProof(result).encodeABI()
-    // }
-
-    // // create the signature 
-    // const signature = await web3.eth.accounts.signTransaction(tx, PRIVATE_KEY)
+    // create the signature 
+    const signature = await web3.eth.accounts.signTransaction(tx, PRIVATE_KEY)
     
-    // // send the signed transaction
-    // web3.eth.sendSignedTransaction(signature.rawTransaction).on(
-    //     "receipt", (receipt) => {console.log(receipt)}
-    // )
-
+    // send the signed transaction
+    web3.eth.sendSignedTransaction(signature.rawTransaction).on(
+        "receipt", (receipt) => {console.log(receipt)}
+    )
 
 }
 

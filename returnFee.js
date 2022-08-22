@@ -3,12 +3,12 @@ require('dotenv').config();
 
 async function returnFee() {
     
-    const { API_URL, PRIVATE_KEY } = process.env;
+    const { API_URL, PRIVATE_KEY, MY_ADDRESS, CONTRACT_ADDRESS } = process.env;
     const web3 = new Web3(API_URL)
-    const myAddress = '0x67E73B3d9883e647D4f67bCB535913951268DA46'
-    const contractAddress = "0x847FB490b9255758738c1DBddD9E3049E9bC86c8"
-    web3.eth.getBalance(myAddress,
-         (call, wei) => { console.log(web3.utils.fromWei(wei, 'ether'))})
+    
+    // test to get balance
+    // web3.eth.getBalance(MY_ADDRESS,
+    //      (call, wei) => { console.log(web3.utils.fromWei(wei, 'ether'))})
 
  
     let abi = [
@@ -28,13 +28,13 @@ async function returnFee() {
     ]
     
     // create the new contract related to abi
-    const contract = await new web3.eth.Contract(abi, contractAddress)
+    const contract = await new web3.eth.Contract(abi, CONTRACT_ADDRESS)
     // transaction definition
     const tx = {
-        from: myAddress,
-        to: contractAddress, 
+        from: MY_ADDRESS,
+        to: CONTRACT_ADDRESS, 
         gas: 1153200,
-        data: contract.methods.claim(1).encodeABI()
+        data: contract.encodeABI()
     }
 
     // create the signature 
