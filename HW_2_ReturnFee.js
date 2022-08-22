@@ -28,7 +28,7 @@ async function returnFee() {
     ]
     
     // create the new contract related to abi
-    const contract = await new web3.eth.Contract(abi, CONTRACT_ADDRESS)
+    const contract = new web3.eth.Contract(abi, CONTRACT_ADDRESS)
     // transaction definition
     const tx = {
         from: MY_ADDRESS,

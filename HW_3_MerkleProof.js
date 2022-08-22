@@ -43,7 +43,7 @@ async function merkleProof() {
         }
     ]
 
-    const contract = await new web3.eth.Contract(abi, CONTRACT_ADDRESS)
+    const contract = new web3.eth.Contract(abi, CONTRACT_ADDRESS)
 
     const ary = [4, 0, 1, 2, 3, 5, 6] // give the order for this (based on item's hashed order)
 
@@ -64,7 +64,7 @@ async function merkleProof() {
     // use self build method
     const level1 = hashes[1]
     const level2 = hashWithSorted(hashes[2], hashes[3])
-    const level3_1 = hashWithSorted(hashes[5], hashes[4])
+    const level3_1 = hashWithSorted(hashes[4], hashes[5])
     const level3 = hashWithSorted(hashes[6], level3_1)
 
     const levelHash = hashWithSorted(hashes[0], level1)

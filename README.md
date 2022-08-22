@@ -8,43 +8,41 @@ https://hackmd.io/@ChiHaoLu/ZKPlayground-HW0
 1. **HW_1**: Use web3 to send transaction to contract (SendTransaction.js)
     -> Binding private key into account 
     ```
-    const account = web3.eth.accounts.privateKeyToAccount(PRIVATE_KEY)
-    web3.eth.accounts.wallet.add(account)
-    web3.eth.defaultAddress = account.address
+        const account = web3.eth.accounts.privateKeyToAccount(PRIVATE_KEY)
+        web3.eth.accounts.wallet.add(account)
+        web3.eth.defaultAddress = account.address
     ```
     -> Estimate the transaction gas
     ```
-    await web3.eth.estimateGas(tx)
+        web3.eth.estimateGas(tx)
     ```
     -> Create basic transaction 
     ```
-    new web3.eth.sendTransaction(tx, CONTRACT_ADDRESS
+        web3.eth.sendTransaction(tx, CONTRACT_ADDRESS
     ```
 2. **HW_2**: MACI (Minimum Anti-collusion infrasturcutre) 
     ```
      TODO 
     ```
-3. **HW_3**: ReturnFee.js, call claim abi to interact with contract
-    -> Prepare JSON RPC abi based on item's function
+3. **HW_3**: ReturnFee.js, call claim abi to interact with contract\
+    -> Prepare JSON RPC abi based on item's function\
     -> Create contract and use contract claim(1) method
     ```
-    const contract = new web3.eth.Contract(abi, CONTRACT_ADDRESS)
-    const claim = contract.methods.claim(1)
+        const contract = new web3.eth.Contract(abi, CONTRACT_ADDRESS)
+        const claim = contract.methods.claim(1)
     ```
     -> Interact with contract and use method.estimateGas 
     ```
-    const tx = {
-        from: MY_ADDRESS,
-        to: CONTRACT_ADDRESS, 
-        gas: await claim.estimateGas({from: MY_ADDRESS}),
-        data: claim.encodeABI()
-    }
+        const tx = {
+            from: MY_ADDRESS,
+            to: CONTRACT_ADDRESS, 
+            gas: await claim.estimateGas({from: MY_ADDRESS}),
+            data: claim.encodeABI()
+        }
     ```
 4. **HW_4**: MerkleProof.js
     - Understand the merkleProof method\
-      refer to https://medium.com/crypto-0-nite/merkle-proofs-explained-6dd429623dc5, 
-               https://coinsbench.com/smart-contract-whitelist-mechanism-fbe3464159ed \
-      It is the way to easily proof the exist item in the merkleTree structure and save gas (contract only need to save root) \
+      It is the way to easily prove the exist item in the merkleTree structure and save gas (contract only save root) \
       *Example*: We should prepare **blue blocks** to proof your leaf is existing
       ![image](https://user-images.githubusercontent.com/48560984/185973935-1d18dc40-3569-499d-86dd-22f2e74fffdf.png)
 
@@ -75,3 +73,9 @@ https://hackmd.io/@ChiHaoLu/ZKPlayground-HW0
            }
         ```
     - Call merkleProof method to verify the keyword (the same as HW_3)
+    
+### Reference 
+- MerkleProof : https://medium.com/crypto-0-nite/merkle-proofs-explained-6dd429623dc5
+- MerkleProof2 : https://coinsbench.com/smart-contract-whitelist-mechanism-fbe3464159ed
+- Web3.js doc: https://web3js.readthedocs.io/en/v1.2.11/web3-eth.html#
+- MACI : https://hackmd.io/@OFccBlU5TNCiRhpIyT1m7g/SkXv-gO5r (TODO)
