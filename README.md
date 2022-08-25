@@ -20,10 +20,26 @@ https://hackmd.io/@ChiHaoLu/ZKPlayground-HW0
     ```
         web3.eth.sendTransaction(tx, CONTRACT_ADDRESS
     ```
-2. **HW_2**: MACI (Minimum Anti-collusion infrasturcutre) 
-    ```
-     TODO 
-    ```
+2. **HW_2**: MACI (Minimum Anti-collusion infrasturcutre, My understanding)\
+    - Background: MACI make collusion among participants difficult. Although MACI can provide collusion resistance only if the coordinator is honest, a dishonest coordinator neither censor nor tamper with its execution.
+    - Role
+      - Coordinator: who holds the participants public keys 
+      - Participants: who are in whitelist of the contract and when he/she want to vote, the vote is encrypted by their own private key and Coordinator's public key
+    - SignUp(Add into whitelist)\ 
+      Put participants into whiltelist. This behavior is quite similar as merkleproof. Once someone signup, he/she will provider key to signup. After checking, whitelist will build the leaf and change the root. 
+    - Vote(Send ecrypted message)\ 
+      Participants encrypt their message by three things
+         - private key (which public key has been signed on)
+         - random key 
+         - coordinator public key
+      So it could replace the pair based on changing keypair in signup ???
+    - Result\
+      According to this way, there is no way to bribe the every participant. Because participants could change public key to coordinator in contract
+      ![image](https://user-images.githubusercontent.com/48560984/186554775-5f17f972-ad31-4a66-b547-595613ab66a5.png)
+    - TODO\
+      - What is EdDSA? 
+      - About coordinator processing still confusing.
+      
 3. **HW_3**: ReturnFee.js, call claim abi to interact with contract\
     -> Prepare JSON RPC abi based on item's function\
     -> Create contract and use contract claim(1) method
